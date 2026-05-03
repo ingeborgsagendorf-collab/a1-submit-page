@@ -1,0 +1,641 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建筑 A1 自动出图资料提交页</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        input[type="text"], input[type="email"], input[type="url"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="url"]:focus, select:focus, textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .service-settings {
+            margin: 0 0 28px;
+            padding: 20px;
+            border: 1px solid #e5e9ec;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        .service-settings h2 {
+            margin: 0 0 14px;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        .webhook-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+        .webhook-row input {
+            flex: 1;
+        }
+        .save-url-btn {
+            flex: 0 0 auto;
+            border: none;
+            border-radius: 8px;
+            padding: 0 18px;
+            background: #2c3e50;
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .save-url-btn:hover {
+            background: #1f2d3a;
+        }
+        .url-status {
+            min-height: 18px;
+            margin-top: 8px;
+            color: #2c7a4b;
+            font-size: 13px;
+        }
+        .file-input {
+            border: 2px dashed #bdc3c7;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-input:hover {
+            border-color: #3498db;
+            background: #f8f9fa;
+        }
+        .file-input input[type="file"] {
+            display: none;
+        }
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+        .result {
+            white-space: pre-wrap;
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .note {
+            font-size: 13px;
+            color: #95a5a6;
+            margin-top: 5px;
+        }
+        .selected-files {
+            margin-top: 10px;
+            padding: 12px;
+            border: 1px solid #d7eadf;
+            border-radius: 8px;
+            background: #f6fbf8;
+            color: #2c7a4b;
+            font-size: 13px;
+            line-height: 1.5;
+            display: none;
+        }
+        .selected-files.visible {
+            display: block;
+        }
+        .selected-files .file-summary {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1f6b3d;
+        }
+        .selected-files .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .selected-files .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 10px;
+            border: 1px solid #dcefe4;
+            border-radius: 6px;
+            background: #ffffff;
+        }
+        .selected-files .file-name {
+            min-width: 0;
+            overflow-wrap: anywhere;
+            color: #2c3e50;
+        }
+        .selected-files .remove-file {
+            flex: 0 0 auto;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            background: #e74c3c;
+            color: #ffffff;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .selected-files .remove-file:hover {
+            background: #c0392b;
+        }
+        .selected-files .file-warning {
+            margin-bottom: 8px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        .multi-note {
+            font-size: 12px;
+            color: #e74c3c;
+            margin-top: 4px;
+        }
+        @media (max-width: 640px) {
+            body {
+                margin: 0;
+                padding: 12px;
+            }
+            .container {
+                padding: 24px;
+            }
+            .webhook-row {
+                flex-direction: column;
+            }
+            .save-url-btn {
+                padding: 12px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>建筑 A1 自动出图资料提交页</h1>
+        <p class="subtitle">上传任务书、模型截图、场地和平面资料，系统会自动生成 A1 排版图，并通过邮件返还结果。</p>
+
+        <div class="service-settings">
+            <h2>服务地址设置</h2>
+            <label for="webhookUrlInput">Webhook URL *</label>
+            <div class="webhook-row">
+                <input type="url" id="webhookUrlInput" placeholder="请输入 n8n Webhook URL">
+                <button type="button" id="saveWebhookUrlBtn" class="save-url-btn">保存地址</button>
+            </div>
+            <div id="webhookUrlStatus" class="url-status"></div>
+            <div class="note">如果服务地址变更，可在这里修改并保存到本机浏览器。</div>
+            <div class="note">给别人使用时请确认这里是 /webhook/a1-task-submit，不是 /webhook-test/a1-task-submit。</div>
+        </div>
+
+        <form id="taskForm" novalidate>
+            <div class="form-group">
+                <label>接收结果邮箱 *</label>
+                <input type="email" name="email" required placeholder="your@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>项目名称 *</label>
+                <input type="text" name="project_name" required placeholder="例如：乡村研学中心">
+            </div>
+
+            <div class="form-group">
+                <label>访问码 *</label>
+                <input type="text" name="access_code" required placeholder="请输入访问码">
+            </div>
+
+            <div class="form-group">
+                <label>项目类型</label>
+                <select name="project_type">
+                    <option value="建筑课程设计">建筑课程设计</option>
+                    <option value="景观课程设计">景观课程设计</option>
+                    <option value="室内课程设计">室内课程设计</option>
+                    <option value="竞赛方案">竞赛方案</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>紧急程度</label>
+                <select name="deadline_level">
+                    <option value="普通">普通</option>
+                    <option value="加急">加急</option>
+                    <option value="救急">救急</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>任务书文字补充 / 老师要求</label>
+                <textarea name="task_brief_text" rows="3" placeholder="老师口头要求、评分重点..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>项目现状描述</label>
+                <textarea name="project_brief" rows="3" placeholder="已有的方案想法、功能、场地..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>场地描述 / 周边关系补充</label>
+                <textarea name="site_description" rows="3" placeholder="例如：基地与村庄、水库、道路、山体、入口方向的关系。"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>特殊要求 / 不可改动内容</label>
+                <textarea name="special_notes" rows="2" placeholder="例如：入口必须在右侧、不要改成木屋风、平面和总平必须对上。"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>风格偏好 / 特别要求</label>
+                <textarea name="style_notes" rows="2" placeholder="暖灰米白、竞赛感、留白多..."></textarea>
+            </div>
+
+
+            <div class="form-group">
+                <label>A1 图面倾向</label>
+                <select name="a1_presentation_preference">
+                    <option value="auto" selected>auto（自动判断：逻辑密度 or PS视觉）</option>
+                    <option value="logical_dense">logical_dense（逻辑密度拉满）</option>
+                    <option value="visual_ps">visual_ps（PS视觉感拉满）</option>
+                </select>
+                <div class="note">系统不会走平衡型，会强制二选一：要么逻辑感拉满，要么视觉完成度拉满。</div>
+            </div>
+
+            <div class="form-group">
+                <label>运行模式</label>
+                <select name="run_mode">
+                    <option value="normal" selected>normal（推荐）</option>
+                    <option value="test_only">test_only（只测试上传与场地理解，不生成图）</option>
+                    <option value="fast">fast（仅核心4张图）</option>
+                    <option value="full">full（完整链路）</option>
+                </select>
+            </div>
+
+            <!-- 文件上传 -->
+            <div class="form-group">
+                <label>任务书 PDF / 作业要求文件</label>
+                <div class="file-input">
+                    <input type="file" name="task_brief_file" id="task_brief_file">
+                    <label for="task_brief_file" style="cursor:pointer;">点击选择文件（单文件）</label>
+                </div>
+                <div id="task_brief_file_display" class="selected-files"></div>
+            </div>
+
+            <div class="form-group">
+                <label>A1排版风格参考图 *</label>
+                <div class="file-input">
+                    <input type="file" name="style_reference_image" id="style_reference_image" required>
+                    <label for="style_reference_image" style="cursor:pointer;">点击选择 1 张图片（A1排版风格锚点）</label>
+                </div>
+                <div id="style_reference_image_display" class="selected-files"></div>
+                <div class="multi-note">仅支持单文件上传，用于锁定 A1 排版风格</div>
+            </div>
+
+            <div class="form-group">
+                <label>白膜 / 模型截图 *</label>
+                <div class="file-input">
+                    <input type="file" name="white_model_image" id="white_model_image" multiple required>
+                    <label for="white_model_image" style="cursor:pointer;">点击选择多张图片（最多5张）</label>
+                </div>
+                <div id="white_model_image_display" class="selected-files"></div>
+                <div class="multi-note">支持多文件上传</div>
+            </div>
+
+            <div class="form-group">
+                <label>总平草图 / 场地关系图</label>
+                <div class="file-input">
+                    <input type="file" name="site_plan_sketch" id="site_plan_sketch" multiple>
+                    <label for="site_plan_sketch" style="cursor:pointer;">点击选择多张图片（最多3张）</label>
+                </div>
+                <div id="site_plan_sketch_display" class="selected-files"></div>
+                <div class="multi-note">支持多文件上传</div>
+            </div>
+
+            <div class="form-group">
+                <label>平面草图 / 功能草图</label>
+                <div class="file-input">
+                    <input type="file" name="floor_plan_sketch" id="floor_plan_sketch" multiple>
+                    <label for="floor_plan_sketch" style="cursor:pointer;">点击选择多张图片（最多3张）</label>
+                </div>
+                <div id="floor_plan_sketch_display" class="selected-files"></div>
+                <div class="multi-note">支持多文件上传</div>
+            </div>
+
+            <div class="form-group">
+                <label>场地照片 / 卫星图 / 周边关系图（可选）</label>
+                <div class="file-input">
+                    <input type="file" name="site_context_image" id="site_context_image" multiple>
+                    <label for="site_context_image" style="cursor:pointer;">点击选择多张图片（最多4张）</label>
+                </div>
+                <div id="site_context_image_display" class="selected-files"></div>
+                <div class="multi-note">支持多文件上传</div>
+            </div>
+
+            <button type="submit" class="btn">提交任务</button>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        const DEFAULT_WEBHOOK_URL = "https://dislike-landside-ruckus.ngrok-free.dev/webhook/a1-task-submit";
+        const WEBHOOK_STORAGE_KEY = 'a1_webhook_url';
+
+        const webhookUrlInput = document.getElementById('webhookUrlInput');
+        const saveWebhookUrlBtn = document.getElementById('saveWebhookUrlBtn');
+        const webhookUrlStatus = document.getElementById('webhookUrlStatus');
+        const savedWebhookUrl = localStorage.getItem(WEBHOOK_STORAGE_KEY);
+        webhookUrlInput.value = savedWebhookUrl || DEFAULT_WEBHOOK_URL;
+
+        saveWebhookUrlBtn.addEventListener('click', function() {
+            const webhookUrl = webhookUrlInput.value.trim();
+            webhookUrlStatus.textContent = '';
+
+            if (!webhookUrl) {
+                webhookUrlStatus.textContent = '请先填写 Webhook URL。';
+                return;
+            }
+
+            localStorage.setItem(WEBHOOK_STORAGE_KEY, webhookUrl);
+            webhookUrlStatus.textContent = '服务地址已保存。';
+        });
+
+        document.getElementById('taskForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const resultDiv = document.getElementById('result');
+            const submitButton = form.querySelector('button[type="submit"]');
+            const webhookUrl = webhookUrlInput.value.trim();
+
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+
+            const validationErrors = [];
+            if (!webhookUrl) validationErrors.push('请填写 Webhook URL。');
+            if (!form.elements.email.value.trim()) validationErrors.push('请填写接收结果邮箱。');
+            if (!form.elements.project_name.value.trim()) validationErrors.push('请填写项目名称。');
+            if (!form.elements.access_code.value.trim()) validationErrors.push('请填写访问码。');
+            if (document.getElementById('style_reference_image').files.length < 1) validationErrors.push('请上传 A1 排版风格参考图。');
+            if (document.getElementById('white_model_image').files.length < 1) validationErrors.push('请至少上传 1 张白膜 / 模型截图。');
+
+            if (validationErrors.length > 0) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `提交前请先补充以下内容：\n${validationErrors.join('\n')}`;
+                return;
+            }
+
+            const formData = new FormData(form);
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = '正在上传，请稍候...';
+            submitButton.disabled = true;
+            resultDiv.textContent = '正在上传，请稍候...';
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const text = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    data = { raw: text };
+                }
+
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    const taskId = data.task_id || data.taskId || data.id || data.execution_id || '未返回';
+                    const receivedFilesCount = getReceivedFilesCount(data.received_files);
+                    const successLines = [
+                        '提交成功',
+                        `任务 ID：${taskId}`,
+                        '请等待邮件返回结果'
+                    ];
+
+                    if (receivedFilesCount !== null) {
+                        successLines.push(`已收到的文件数量：${receivedFilesCount}`);
+                    }
+
+                    successLines.push('', '返回内容：', JSON.stringify(data, null, 2));
+                    resultDiv.textContent = successLines.join('\n');
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = [
+                        '提交失败',
+                        `错误信息：状态码 ${response.status}`,
+                        JSON.stringify(data, null, 2),
+                        '',
+                        '建议检查：n8n 是否运行、ngrok 是否在线、workflow 是否激活、webhook URL 是否正确。'
+                    ].join('\n');
+                }
+            } catch (err) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = [
+                    '提交失败',
+                    `错误信息：${err.message}`,
+                    '',
+                    '建议检查：n8n 是否运行、ngrok 是否在线、workflow 是否激活、webhook URL 是否正确。'
+                ].join('\n');
+            } finally {
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            }
+        });
+
+        function getReceivedFilesCount(receivedFiles) {
+            if (Array.isArray(receivedFiles)) return receivedFiles.length;
+            if (typeof receivedFiles === 'number') return receivedFiles;
+            if (receivedFiles && typeof receivedFiles === 'object') {
+                const values = Object.values(receivedFiles);
+                if (values.every(value => Array.isArray(value))) {
+                    return values.reduce((total, value) => total + value.length, 0);
+                }
+                if (values.every(value => typeof value === 'number')) {
+                    return values.reduce((total, value) => total + value, 0);
+                }
+                return Object.keys(receivedFiles).length;
+            }
+            return null;
+        }
+
+        // 文件选择显示功能
+        const uploadConfigs = {
+            task_brief_file: { displayId: 'task_brief_file_display', multiple: false },
+            style_reference_image: { displayId: 'style_reference_image_display', multiple: false },
+            white_model_image: { displayId: 'white_model_image_display', multiple: true, max: 5 },
+            site_plan_sketch: { displayId: 'site_plan_sketch_display', multiple: true, max: 3 },
+            floor_plan_sketch: { displayId: 'floor_plan_sketch_display', multiple: true, max: 3 },
+            site_context_image: { displayId: 'site_context_image_display', multiple: true, max: 4 }
+        };
+
+        const uploadFilePools = {};
+
+        function sameFile(a, b) {
+            return a.name === b.name && a.size === b.size;
+        }
+
+        function setInputFiles(input, files) {
+            const transfer = new DataTransfer();
+            files.forEach(file => transfer.items.add(file));
+            input.files = transfer.files;
+        }
+
+        function createFileItem(file, onRemove) {
+            const item = document.createElement('div');
+            item.className = 'file-item';
+
+            const name = document.createElement('span');
+            name.className = 'file-name';
+            name.textContent = file.name;
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'remove-file';
+            removeButton.textContent = '删除';
+            removeButton.addEventListener('click', onRemove);
+
+            item.appendChild(name);
+            item.appendChild(removeButton);
+            return item;
+        }
+
+        function renderUploadStatus(inputId, warningText) {
+            const config = uploadConfigs[inputId];
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(config.displayId);
+            const files = uploadFilePools[inputId] || [];
+
+            display.replaceChildren();
+            if (files.length === 0) {
+                display.classList.remove('visible');
+                return;
+            }
+
+            display.classList.add('visible');
+
+            if (warningText) {
+                const warning = document.createElement('div');
+                warning.className = 'file-warning';
+                warning.textContent = warningText;
+                display.appendChild(warning);
+            }
+
+            const summary = document.createElement('div');
+            summary.className = 'file-summary';
+            summary.textContent = config.multiple
+                ? `已选择 ${files.length} 个文件（最多 ${config.max} 个）`
+                : `已选择：${files[0].name}`;
+            display.appendChild(summary);
+
+            if (config.multiple) {
+                const list = document.createElement('div');
+                list.className = 'file-list';
+                files.forEach((file, index) => {
+                    list.appendChild(createFileItem(file, function() {
+                        uploadFilePools[inputId].splice(index, 1);
+                        setInputFiles(input, uploadFilePools[inputId]);
+                        renderUploadStatus(inputId);
+                    }));
+                });
+                display.appendChild(list);
+            }
+        }
+
+        function setupUploadField(inputId) {
+            const config = uploadConfigs[inputId];
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(config.displayId);
+            if (!input || !display) return;
+
+            uploadFilePools[inputId] = [];
+
+            input.addEventListener('change', function() {
+                const selectedFiles = Array.from(input.files || []);
+                let warningText = '';
+
+                if (config.multiple) {
+                    const mergedFiles = uploadFilePools[inputId].slice();
+                    selectedFiles.forEach(file => {
+                        if (!mergedFiles.some(existingFile => sameFile(existingFile, file))) {
+                            mergedFiles.push(file);
+                        }
+                    });
+
+                    if (mergedFiles.length > config.max) {
+                        warningText = `最多只能上传 ${config.max} 个文件`;
+                    }
+
+                    uploadFilePools[inputId] = mergedFiles.slice(0, config.max);
+                    setInputFiles(input, uploadFilePools[inputId]);
+                    renderUploadStatus(inputId, warningText);
+                    return;
+                }
+
+                uploadFilePools[inputId] = selectedFiles.slice(0, 1);
+                renderUploadStatus(inputId);
+            });
+        }
+
+        Object.keys(uploadConfigs).forEach(setupUploadField);
+    </script>
+</body>
+</html>
